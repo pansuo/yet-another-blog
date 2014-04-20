@@ -1,0 +1,215 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link rel="shortcut icon" type="image/x-icon" href="img/favicon.ico">
+  <title>Yet Another Blog</title>
+  <link rel="stylesheet" href="http://netdna.bootstrapcdn.com/bootstrap/3.1.1/css/bootstrap.min.css">
+  <link rel="stylesheet" href="css/blog.css">
+  <!--[if lt IE 9]><script src="js/libs/ie8-responsive-file-warning.js"></script><![endif]-->
+  <!-- HTML5 shim and Respond.js IE8 support of HTML5 elements and media queries -->
+  <!--[if lt IE 9]>
+    <script src="https://oss.maxcdn.com/libs/html5shiv/3.7.0/html5shiv.js"></script>
+    <script src="https://oss.maxcdn.com/libs/respond.js/1.4.2/respond.min.js"></script>
+  <![endif]-->
+</head>
+<body>
+  <script type="text/x-handlebars">
+    <div class="blog-masthead">
+      <div class="container">
+        <nav class="blog-nav">
+          {{#link-to "posts" classNames="blog-nav-item"}}Home{{/link-to}}
+          {{#link-to "sample" classNames="blog-nav-item"}}Sample{{/link-to}}
+          {{#link-to "new" classNames="blog-nav-item"}}New{{/link-to}}
+        </nav>
+      </div>
+    </div>
+    <div class="container">
+      <div class="blog-header">
+        <h1 class="blog-title">Yet Another Blog</h1>
+        <p class="lead blog-description">Simple blog on Ember.js + Google Apps Script</p>
+      </div>
+      <div class="row">
+        {{outlet}}
+      </div><!-- /.row -->
+    </div><!-- /.container -->
+    <div class="blog-footer">
+      <p>Blog template built for <a href="http://getbootstrap.com">Bootstrap</a> by <a href="https://twitter.com/mdo">@mdo</a>.</p>      
+    </div>
+  </script>
+
+  <script type="text/x-handlebars" id="index">
+    <div class="col-sm-8 blog-main">
+      {{outlet}}
+    </div><!-- /.blog-main -->
+    <div class="col-sm-3 col-sm-offset-1 blog-sidebar">
+      {{partial "sidebar"}}
+    </div><!-- /.blog-sidebar -->
+  </script>
+
+  <script type="text/x-handlebars" id="posts">
+    {{partial "posts-wrapper"}}
+  </script>
+
+  <script type="text/x-handlebars" id="tags">
+    {{partial "posts-wrapper"}}
+  </script>   
+
+  <script type="text/x-handlebars" id="post">
+    <div class="blog-post">
+      {{partial "post-header"}}
+      <hr>
+      <div>{{format-markdown body}}</div>
+      {{#if isEditing}}
+        {{partial "post-edit"}}
+        <button class="btn btn-primary" {{action 'save'}}>Save</button>
+      {{else}}
+        <button class="btn btn-primary" {{action 'edit'}}>Edit</button>
+      {{/if}}
+    </div> 
+  </script>
+
+  <script type="text/x-handlebars" id="posts-wrapper">
+    {{#each}}
+    <div class="blog-post">
+      {{partial "post-header"}}      
+      <div class="blog-post-tags">
+        <ul class="list-inline">
+        {{#each this.tags}}
+          <li>{{#link-to 'tags' this}}{{this}}{{/link-to}}</li>
+        {{/each}}
+        </ul> 
+      </div>
+    </div>
+    {{/each}}
+  </script>
+
+  <script type="text/x-handlebars" id="post-header">
+    <h2 class="blog-post-title">{{#link-to 'post' this}}{{title}}{{/link-to}}</h2>
+    <p class="blog-post-meta">{{created}} by <a {{bind-attr href=href}} target="_blank">{{author}}</a></p>
+    <div>{{format-markdown excerpt}}</div>
+  </script>  
+
+  <script type="text/x-handlebars" id="post-edit">
+    <div class="form-group">
+      <label for="tags">Tags</label>
+      {{input type="text" value=tags class="form-control" name="tags" placeholder="comma separated tags"}}
+    </div>
+    <div class="form-group">
+      <label for="title">Title</label>
+      {{input type="text" value=title class="form-control" name="title" placeholder="title"}}
+    </div>
+    <div class="form-group">
+      <label for="excerpt">Excerpt</label>
+      {{input type="text" value=excerpt class="form-control" name="excerpt" placeholder="excerpt"}}
+    </div>
+    <div class="form-group">
+      <label for="body">Body</label>
+      {{textarea value=body class="form-control" rows=8 name="body" placeholder="body"}}
+    </div>
+  </script>
+
+  <script type="text/x-handlebars" id="new">    
+    <form id="newpost" role="form" class="blog-post">
+      <h3>Preview:</h3>
+      {{partial "post-header"}}
+      <hr>
+      <div>{{format-markdown body}}</div>
+      <hr>      
+      <div class="form-group">
+        <label for="author">Author</label>
+        {{input type="text" value=author class="form-control" name="author" placeholder="author"}}
+      </div>
+      <div class="form-group">
+        <label for="href">Hyperlink</label>
+        {{input type="text" value=href class="form-control" name="href" placeholder="hyperlink to the author's site" }}
+      </div>
+      {{partial "post-edit"}}
+      <button class="btn btn-primary" {{action 'save'}}>Save</button>
+    </form>    
+  </script> 
+  
+  <script type="text/x-handlebars" id="sidebar">
+    <div class="sidebar-module sidebar-module-inset">
+      <h4>About</h4>
+      <p>Etiam porta <em>sem malesuada magna</em> mollis euismod. Cras mattis consectetur purus sit amet fermentum. Aenean lacinia bibendum nulla sed consectetur.</p>
+    </div>
+    <div class="sidebar-module">
+      <h4>Tags</h4>
+      <ol class="list-unstyled">
+        {{#each tags}}
+        <li>{{#link-to 'tags' this.name}}{{this.name}} ({{this.number}}){{/link-to}}</li>
+        {{/each}}
+      </ol>
+    </div>
+    <div class="sidebar-module">
+      <h4>Recent</h4>
+      <ol class="list-unstyled">
+        {{#each recent}}
+        <li>{{#link-to 'post' this}}{{title}}{{/link-to}}</li>      
+        {{/each}}
+      </ol>
+    </div>
+    <div class="sidebar-module">
+      <h4>Archives</h4>
+      <ol class="list-unstyled">
+        <li><a href="#">February 2014</a></li>
+        <li><a href="#">January 2014</a></li>
+        <li><a href="#">December 2013</a></li>          
+      </ol>
+    </div>
+    <div class="sidebar-module">
+      <h4>Elsewhere</h4>
+      <ol class="list-unstyled">
+        <li><a href="#">GitHub</a></li>
+        <li><a href="#">Twitter</a></li>
+        <li><a href="#">Facebook</a></li>
+      </ol>
+    </div>
+  </script>
+
+  <script type="text/x-handlebars" id="sample">
+    <div class="blog-post">
+      <h2 class="blog-post-title">Sample blog post</h2>
+      <p class="blog-post-meta">January 1, 2014 by <a href="#">Mark</a></p>
+
+      <p>This blog post shows a few different types of content that's supported and styled with Bootstrap. Basic typography, images, and code are all supported.</p>
+      <hr>
+      <p>Cum sociis natoque penatibus et magnis <a href="#">dis parturient montes</a>, nascetur ridiculus mus. Aenean eu leo quam. Pellentesque ornare sem lacinia quam venenatis vestibulum. Sed posuere consectetur est at lobortis. Cras mattis consectetur purus sit amet fermentum.</p>
+      <blockquote>
+        <p>Curabitur blandit tempus porttitor. <strong>Nullam quis risus eget urna mollis</strong> ornare vel eu leo. Nullam id dolor id nibh ultricies vehicula ut id elit.</p>
+      </blockquote>
+      <p>Etiam porta <em>sem malesuada magna</em> mollis euismod. Cras mattis consectetur purus sit amet fermentum. Aenean lacinia bibendum nulla sed consectetur.</p>
+      <h2>Heading</h2>
+      <p>Vivamus sagittis lacus vel augue laoreet rutrum faucibus dolor auctor. Duis mollis, est non commodo luctus, nisi erat porttitor ligula, eget lacinia odio sem nec elit. Morbi leo risus, porta ac consectetur ac, vestibulum at eros.</p>
+      <h3>Sub-heading</h3>
+      <p>Cum sociis natoque penatibus et magnis dis parturient montes, nascetur ridiculus mus.</p>
+      <pre><code>Example code block</code></pre>
+      <p>Aenean lacinia bibendum nulla sed consectetur. Etiam porta sem malesuada magna mollis euismod. Fusce dapibus, tellus ac cursus commodo, tortor mauris condimentum nibh, ut fermentum massa.</p>
+      <h3>Sub-heading</h3>
+      <p>Cum sociis natoque penatibus et magnis dis parturient montes, nascetur ridiculus mus. Aenean lacinia bibendum nulla sed consectetur. Etiam porta sem malesuada magna mollis euismod. Fusce dapibus, tellus ac cursus commodo, tortor mauris condimentum nibh, ut fermentum massa justo sit amet risus.</p>
+      <ul>
+        <li>Praesent commodo cursus magna, vel scelerisque nisl consectetur et.</li>
+        <li>Donec id elit non mi porta gravida at eget metus.</li>
+        <li>Nulla vitae elit libero, a pharetra augue.</li>
+      </ul>
+      <p>Donec ullamcorper nulla non metus auctor fringilla. Nulla vitae elit libero, a pharetra augue.</p>
+      <ol>
+        <li>Vestibulum id ligula porta felis euismod semper.</li>
+        <li>Cum sociis natoque penatibus et magnis dis parturient montes, nascetur ridiculus mus.</li>
+        <li>Maecenas sed diam eget risus varius blandit sit amet non magna.</li>
+      </ol>
+      <p>Cras mattis consectetur purus sit amet fermentum. Sed posuere consectetur est at lobortis.</p>
+    </div><!-- /.blog-post -->
+  </script>
+
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.0/jquery.min.js"></script>
+  <script src="http://cdnjs.cloudflare.com/ajax/libs/handlebars.js/1.1.2/handlebars.js"></script>
+  <script src="http://cdnjs.cloudflare.com/ajax/libs/ember.js/1.5.0/ember.min.js"></script>
+  <script src="http://cdnjs.cloudflare.com/ajax/libs/showdown/0.3.1/showdown.min.js"></script>  
+
+  <script src="js/app.js"></script>  
+</body>
+</html>
