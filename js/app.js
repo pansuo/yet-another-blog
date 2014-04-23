@@ -14,8 +14,7 @@ App.Router.map(function() {
 });
 
 App.ApplicationController = Ember.ObjectController.extend({
-  url: 'https://script.google.com/macros/s/AKfycbzH3ZAwcL5U98fXeQtXo0WC-oGAlJt4KL2DmmNV4EA9cUBSLZw/exec', 
-
+  url: 'https://script.google.com/macros/s/AKfycbzH3ZAwcL5U98fXeQtXo0WC-oGAlJt4KL2DmmNV4EA9cUBSLZw/exec'
 });
 
 App.IndexRoute = Ember.Route.extend({
