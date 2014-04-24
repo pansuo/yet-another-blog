@@ -1,10 +1,10 @@
 function doGet(e) {
-  var sh = SpreadsheetApp.openById('1lZ7oRBaWTRQEDlUu2MWo_9igRTGQ66QXQP5a8XcWKA8').getSheets()[0],       
+  var sh = SpreadsheetApp.openById('1lZ7oRBaWTRQEDlUu2MWo_9igRTGQ66QXQP5a8XcWKA8').getSheets()[0], 
       data = sh.getDataRange().getValues(),       
       lastColumn = sh.getLastColumn(), 
       keys = sh.getRange(1, 1, 1, lastColumn).getValues()[0], 
       objects = getObjects(data, keys), 
-      response = {posts: objects, tags: getTags(objects)};
+      response = {posts: objects, props: getProps(objects)}; 
   return ContentService.createTextOutput(JSON.stringify(response)).setMimeType(ContentService.MimeType.JSON);
 }
 
@@ -53,16 +53,24 @@ function getObject(arr, keys, len) {
   return obj;
 }
 
-function getTags(objects) {
-  var tags = {};
+function getProps(objects) {
+  var props = {"tags": {}, "archives": {}}; 
   objects.forEach(function(obj) {   
     obj.tags.forEach(function(tag) {
-      if (tags.hasOwnProperty(tag)) {
-        tags[tag] += 1;
-      } else {
-        tags[tag] = 1;
+      if (tag !== '' ) {
+        if (props.tags.hasOwnProperty(tag)) {
+          props.tags[tag] += 1;
+        } else {
+          props.tags[tag] = 1;
+        }
       }
     });
+    var month = obj.created.getFullYear() + '/' + obj.created.getMonth();
+    if (props.archives.hasOwnProperty(month)) {
+      props.archives[month] += 1;
+    } else {
+      props.archives[month] = 1;
+    }
   });
-  return tags;
+  return props;
 }
