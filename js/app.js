@@ -10,18 +10,20 @@ App.Router.map(function() {
     this.resource('sample', { path: '/sample' });
     this.resource('new', { path: '/posts/new' });
     this.resource('tags', { path: '/tags/:tag_name' });
+    this.resource('archives', { path: '/archives/:year/:month' });
   });
 });
 
 App.ApplicationController = Ember.ObjectController.extend({
-  url: 'https://script.google.com/macros/s/AKfycbzH3ZAwcL5U98fXeQtXo0WC-oGAlJt4KL2DmmNV4EA9cUBSLZw/exec'
+  url: 'https://script.google.com/macros/s/AKfycbx7zJCzTKSwWHwRLGokQQt_hLjjGNPD3hJ1tGkJwEP028Y7dNh1/exec'
 });
 
 App.IndexRoute = Ember.Route.extend({
   model: function() {
     return $.getJSON(this.controllerFor('application').get('url')).then(function(data) {      
       data.posts.forEach(function(post) {
-        post.created = new Date(post.created).toLocaleString();
+        post.date = new Date(post.created);
+        post.created = post.date.toLocaleString();
       });
       return data;
     });
@@ -33,11 +35,23 @@ App.IndexController = Ember.ObjectController.extend({
     return this.get('model.posts').slice(0,3);
   }.property('recent'), 
   tags: function() {
-    var tags = this.get('model.tags');
+    var tags = this.get('model.props.tags');
     return Object.keys(tags).map(function(tag) {
       return {name: tag, number: tags[tag]};
     });
-  }.property('tags')
+  }.property('tags'), 
+  archives: function() {    
+    var archives = this.get('model.props.archives'), 
+        self = this;
+    return Object.keys(archives).map(function(month) {
+      var arr = month.split('/');          
+      return {year: arr[0], monthNumber: arr[1], monthName: self.getMonthName(arr[1]), number: archives[month]};
+    });
+  }.property('archives'), 
+  getMonthName: function(n) {
+    var m = ['January','February','March','April','May','June','July','August','September','October','November','December'];
+    return m[n];
+  }
 });
 
 App.PostsRoute = Ember.Route.extend({
@@ -50,6 +64,14 @@ App.TagsRoute = Ember.Route.extend({
   model: function(params) {
     return this.modelFor('index').posts.filter(function(post) {
       return post.tags.indexOf(params.tag_name) !== -1;
+    });
+  }
+});
+
+App.ArchivesRoute = Ember.Route.extend({
+  model: function(params) {
+    return this.modelFor('index').posts.filter(function(post) {      
+      return post.date.getFullYear() === +params.year && post.date.getMonth() === +params.month;
     });
   }
 });

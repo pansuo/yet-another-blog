@@ -55,6 +55,10 @@
 
   <script type="text/x-handlebars" id="tags">
     {{partial "posts-wrapper"}}
+  </script>
+
+  <script type="text/x-handlebars" id="archives">
+    {{partial "posts-wrapper"}}
   </script>   
 
   <script type="text/x-handlebars" id="post">
@@ -68,22 +72,28 @@
       {{else}}
         <button class="btn btn-primary" {{action 'edit'}}>Edit</button>
       {{/if}}
+      <hr>
+      {{partial "post-tags"}}
     </div> 
   </script>
 
   <script type="text/x-handlebars" id="posts-wrapper">
     {{#each}}
     <div class="blog-post">
-      {{partial "post-header"}}      
-      <div class="blog-post-tags">
-        <ul class="list-inline">
-        {{#each this.tags}}
-          <li>{{#link-to 'tags' this}}{{this}}{{/link-to}}</li>
-        {{/each}}
-        </ul> 
-      </div>
+      {{partial "post-header"}}
+      {{partial "post-tags"}}      
     </div>
     {{/each}}
+  </script>
+
+  <script type="text/x-handlebars" id="post-tags">
+    <div class="blog-post-tags">
+      <ul class="list-inline">
+      {{#each this.tags}}
+        <li>{{#link-to 'tags' this}}{{this}}{{/link-to}}</li>
+      {{/each}}
+      </ul> 
+    </div>
   </script>
 
   <script type="text/x-handlebars" id="post-header">
@@ -155,9 +165,9 @@
     <div class="sidebar-module">
       <h4>Archives</h4>
       <ol class="list-unstyled">
-        <li><a href="#">February 2014</a></li>
-        <li><a href="#">January 2014</a></li>
-        <li><a href="#">December 2013</a></li>          
+        {{#each archives}}
+        <li>{{#link-to 'archives' this.year this.monthNumber}}{{this.monthName}} {{this.year}} ({{this.number}}){{/link-to}}</li>         
+        {{/each}}        
       </ol>
     </div>
     <div class="sidebar-module">
