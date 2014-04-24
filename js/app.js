@@ -124,7 +124,9 @@ App.NewController = Ember.ObjectController.extend({
         type: "POST", 
         crossDomain: true }).then(function(data, status) {          
           self.transitionToRoute('index').then(function () {
-            location.reload(true);
+            if (!that) {
+              location.reload(true);
+            }
             return true;
           });          
         }
