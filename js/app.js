@@ -104,13 +104,13 @@ App.PostController = Ember.ObjectController.extend({
 
 App.NewRoute = Ember.Route.extend({
   model: function() {
-    return { title: '', created: new Date().toLocaleString(), author: '', href: '', tags: '', excerpt: '', body: '' };
+    return { title: '', author: '', href: '', tags: '', excerpt: '', body: '' };
   }
 });
 
 App.NewController= Ember.ObjectController.extend({  
   actions: {
-    save: function(that) {
+    save: function(that) {      
       var self = that || this;          
       $.ajax({ url: this.controllerFor('application').get('url'), 
         data: JSON.stringify(self.get('model')), 
