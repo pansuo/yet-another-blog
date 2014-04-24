@@ -165,7 +165,10 @@ h6, .h6 {
 /*
  * Yet Another Blog
  */
- 
+
+.err {
+  color: #f00;
+}
 .blog-post-tags a {  
   font-size: 14px;  
 }

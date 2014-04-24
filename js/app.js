@@ -14,8 +14,8 @@ App.Router.map(function() {
   });
 });
 
-App.ApplicationController = Ember.ObjectController.extend({
-  url: 'https://script.google.com/macros/s/AKfycbx7zJCzTKSwWHwRLGokQQt_hLjjGNPD3hJ1tGkJwEP028Y7dNh1/exec'
+App.ApplicationController = Ember.ObjectController.extend({  
+  url: 'https://script.google.com/macros/s/AKfycbzH3ZAwcL5U98fXeQtXo0WC-oGAlJt4KL2DmmNV4EA9cUBSLZw/exec'
 });
 
 App.IndexRoute = Ember.Route.extend({
@@ -38,6 +38,8 @@ App.IndexController = Ember.ObjectController.extend({
     var tags = this.get('model.props.tags');
     return Object.keys(tags).map(function(tag) {
       return {name: tag, number: tags[tag]};
+    }).sort(function(a, b) {
+      return b.number - a.number;
     });
   }.property('tags'), 
   archives: function() {    
@@ -96,32 +98,90 @@ App.PostController = Ember.ObjectController.extend({
       this.set('isEditing', true);
     },
     save: function() {
-      this.set('isEditing', false);
-      this.get('controllers.new').send('save', this);
+      if (this.get('controllers.new').send('save', this)) {
+        this.set('isEditing', false);
+      }
     }
   }
 });
 
 App.NewRoute = Ember.Route.extend({
   model: function() {
-    return { title: '', author: '', href: '', tags: '', excerpt: '', body: '' };
+    return { title: '', created: new Date().toLocaleString(), author: '', href: '', tags: '', excerpt: '', body: '' };
   }
 });
 
-App.NewController= Ember.ObjectController.extend({  
+App.NewController = Ember.ObjectController.extend({  
   actions: {
     save: function(that) {      
-      var self = that || this;          
+      var self = that || this;      
+      if (!this.validator.validate(self.get('model'))) {
+        return false; 
+      }
       $.ajax({ url: this.controllerFor('application').get('url'), 
         data: JSON.stringify(self.get('model')), 
         dataType: "json", 
         type: "POST", 
         crossDomain: true }).then(function(data, status) {          
           self.transitionToRoute('index').then(function () {
-            location.reload(true);            
+            location.reload(true);
+            return true;
           });          
         }
       );
+    }    
+  }, 
+  validator: {
+    config: {
+      title: {minLength: 5, maxLength: 100}, 
+      author: {minLength: 5, maxLength: 100},
+      excerpt: {minLength: 10, maxLength: 500}, 
+      body: {minLength: 10, maxLength: 5000}, 
+      href: {isUrl: false}
+    },
+    validate: function(data) {
+      var self = this, valid = true, configProp, element;      
+      for (var prop in data) {        
+        if (this.config.hasOwnProperty(prop)) {          
+          configProp = this.config[prop];
+          Object.keys(configProp).forEach(function(method) {            
+            element = $('.blog-post').find("label[for='" + prop + "']");
+            element.find('span[for="' + method + '"]').remove();
+            if (!self[method].validate(data[prop], configProp[method])) {              
+              valid = false;
+              element.append('<span class="err" for="' + method + '"><sup>&nbsp;*</sup>&nbsp;' + self[method].message(configProp[method]) + '</sup></span>');
+            }
+          });
+        }                
+      }
+      return valid;
+    }, 
+    minLength: {
+      validate: function(data, length) {
+        return data.length >= length;
+      }, 
+      message: function(length) {
+        return 'should be at least ' + length + ' characters';
+      }
+    }, 
+    maxLength: {
+      validate: function (data, length) {
+        return data.length <= length;
+      }, 
+      message: function(length) {         
+        return 'should be less or equal ' + length + ' characters';
+      }
+    }, 
+    isUrl: {
+      validate: function(url, required) {
+        if (!required && url.length === 0) {
+          return true;
+        }
+        return url.match(/^(ht|f)tps?:\/\/[a-z0-9-\.]+\.[a-z]{2,4}\/?([^\s<>\#%"\,\{\}\\|\\\^\[\]`]+)?$/);
+      }, 
+      message: function() {
+        return 'should be a valid url';
+      }
     }
   }
 });
