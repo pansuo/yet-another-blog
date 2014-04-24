@@ -92,7 +92,7 @@
       {{#each this.tags}}
         <li>{{#link-to 'tags' this}}{{this}}{{/link-to}}</li>
       {{/each}}
-      </ul> 
+      </ul>
     </div>
   </script>
 
@@ -104,6 +104,14 @@
 
   <script type="text/x-handlebars" id="post-edit">
     <div class="form-group">
+      <div class="form-group">
+        <label for="author">Author</label>
+        {{input type="text" value=author class="form-control" name="author" placeholder="author"}}
+      </div>
+      <div class="form-group">
+        <label for="href">Hyperlink</label>
+        {{input type="text" value=href class="form-control" name="href" placeholder="hyperlink to the author's site" }}
+      </div>
       <label for="tags">Tags</label>
       {{input type="text" value=tags class="form-control" name="tags" placeholder="comma separated tags"}}
     </div>
@@ -122,20 +130,12 @@
   </script>
 
   <script type="text/x-handlebars" id="new">    
-    <form id="newpost" role="form" class="blog-post">
+    <form role="form" class="blog-post">
       <h3>Preview:</h3>
       {{partial "post-header"}}
       <hr>
       <div>{{format-markdown body}}</div>
       <hr>      
-      <div class="form-group">
-        <label for="author">Author</label>
-        {{input type="text" value=author class="form-control" name="author" placeholder="author"}}
-      </div>
-      <div class="form-group">
-        <label for="href">Hyperlink</label>
-        {{input type="text" value=href class="form-control" name="href" placeholder="hyperlink to the author's site" }}
-      </div>
       {{partial "post-edit"}}
       <button class="btn btn-primary" {{action 'save'}}>Save</button>
     </form>    
