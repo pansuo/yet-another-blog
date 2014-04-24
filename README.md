@@ -14,7 +14,7 @@ How to
 
 TODO
 ----------
-+ archives
++ data validation
 + pagination
 + data storage
 + comments (Google+?)
