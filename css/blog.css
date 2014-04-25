@@ -166,6 +166,10 @@ h6, .h6 {
  * Yet Another Blog
  */
 
+.blog-main > button {
+  margin-bottom: 30px;
+  width: 100%;
+}
 .err {
   color: #f00;
 }
