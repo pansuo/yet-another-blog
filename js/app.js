@@ -15,45 +15,77 @@ App.Router.map(function() {
 });
 
 App.ApplicationController = Ember.ObjectController.extend({  
-  url: 'https://script.google.com/macros/s/AKfycbzH3ZAwcL5U98fXeQtXo0WC-oGAlJt4KL2DmmNV4EA9cUBSLZw/exec'
+  url: 'https://script.google.com/macros/s/AKfycbzH3ZAwcL5U98fXeQtXo0WC-oGAlJt4KL2DmmNV4EA9cUBSLZw/exec' 
 });
 
 App.IndexRoute = Ember.Route.extend({
   model: function() {
-    return $.getJSON(this.controllerFor('application').get('url')).then(function(data) {      
-      data.posts.forEach(function(post) {
-        post.date = new Date(post.created);
-        post.created = post.date.toLocaleString();
-      });
-      return data;
-    });
+    var controller = this.controllerFor('index');
+    return controller.posts('?limit=' + controller.get('limit'));
   }
 });
 
 App.IndexController = Ember.ObjectController.extend({
+  limit: 5, 
+  total: 0, 
+  hasMore: true, 
+  actions: { 
+    more: function() {
+      var model = this.get('model');;
+      this.posts('?limit=' + this.get('limit') + '&offset=' + (this.get('total'))).then(function(data) {       
+        data.posts.forEach(function(post) {
+           model.posts.pushObject(post);
+        });
+      });
+    }
+  }, 
+  posts: function(query) {
+    var url = this.controllerFor('application').get('url') + query, 
+        self = this;
+    return $.getJSON(url).then(function(data) {
+      data.posts.forEach(function(post) {
+        post.date = new Date(post.created);
+        post.created = post.date.toLocaleString();
+      });
+      var total = self.get('total') + data.posts.length;      
+      if (total >= +data.meta.total) {
+        self.set('hasMore', false);
+      }
+      self.set('total', total);
+      return data;
+    });
+  }, 
   recent: function() {
-    return this.get('model.posts').slice(0,3);
+    return this.get('model.posts').slice(0,5);
   }.property('recent'), 
   tags: function() {
-    var tags = this.get('model.props.tags');
+    var tags = this.get('model.meta.tags');
     return Object.keys(tags).map(function(tag) {
       return {name: tag, number: tags[tag]};
     }).sort(function(a, b) {
       return b.number - a.number;
     });
   }.property('tags'), 
-  archives: function() {    
-    var archives = this.get('model.props.archives'), 
+  archives: function() {
+    var archives = this.get('model.meta.archives'), 
         self = this;
     return Object.keys(archives).map(function(month) {
-      var arr = month.split('/');          
-      return {year: arr[0], monthNumber: arr[1], monthName: self.getMonthName(arr[1]), number: archives[month]};
+      var arr = month.split('/');      
+      return {
+        year: arr[0], 
+        monthNumber: arr[1], 
+        monthName: self.getMonthName(arr[1]), 
+        number: archives[month], 
+        index: +(arr[0] + '.' + arr[1])
+      };
+    }).sort(function(a, b) {
+      return b.index - a.index;
     });
   }.property('archives'), 
   getMonthName: function(n) {
     var m = ['January','February','March','April','May','June','July','August','September','October','November','December'];
     return m[n];
-  }
+  }  
 });
 
 App.PostsRoute = Ember.Route.extend({
@@ -70,6 +102,13 @@ App.TagsRoute = Ember.Route.extend({
   }
 });
 
+// App.TagsController = Ember.ObjectController.extend({
+//   needs: 'index', 
+//   filter: function() {
+//     return this.get('controllers.index')
+//   }
+// });
+
 App.ArchivesRoute = Ember.Route.extend({
   model: function(params) {
     return this.modelFor('index').posts.filter(function(post) {      
@@ -82,7 +121,7 @@ App.PostRoute = Ember.Route.extend({
   model: function(params) {
     var posts = this.modelFor('index').posts, 
         id = +params.post_id;
-    for (var i = 0, len = posts.length; i < posts.length; i += 1) {
+    for (var i = 0, len = posts.length; i < len; i += 1) {
       if (posts[i].id === id) {
         return posts[i];
       }
@@ -118,19 +157,20 @@ App.NewController = Ember.ObjectController.extend({
       if (!this.validator.validate(self.get('model'))) {
         return false; 
       }
-      $.ajax({ url: this.controllerFor('application').get('url'), 
+      $.ajax({ 
+        url: this.controllerFor('application').get('url'), 
         data: JSON.stringify(self.get('model')), 
         dataType: "json", 
         type: "POST", 
-        crossDomain: true }).then(function(data, status) {          
-          self.transitionToRoute('index').then(function () {
-            if (!that) {
-              location.reload(true);
-            }
-            return true;
-          });          
-        }
-      );
+        crossDomain: true 
+      }).then(function(data, status) {          
+        self.transitionToRoute('index').then(function () {
+          if (!that) {
+            location.reload(true);
+          }
+          return true;
+        });
+      });
     }    
   }, 
   validator: {
@@ -151,7 +191,8 @@ App.NewController = Ember.ObjectController.extend({
             element.find('span[for="' + method + '"]').remove();
             if (!self[method].validate(data[prop], configProp[method])) {              
               valid = false;
-              element.append('<span class="err" for="' + method + '"><sup>&nbsp;*</sup>&nbsp;' + self[method].message(configProp[method]) + '</sup></span>');
+              element.append('<span class="err" for="' + method + '"><sup>&nbsp;*</sup>&nbsp;' + 
+                self[method].message(configProp[method]) + '</sup></span>');
             }
           });
         }                
