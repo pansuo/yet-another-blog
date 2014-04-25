@@ -15,7 +15,7 @@ How to
 
 TODO
 ----------
-+ pagination
++ observer for tags and archives
 + data storage
 + comments (Google+?)
 + data adapter for Google Apps Script
