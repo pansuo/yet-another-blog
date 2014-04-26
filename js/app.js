@@ -15,13 +15,13 @@ App.Router.map(function() {
 });
 
 App.ApplicationController = Ember.ObjectController.extend({  
-  url: 'https://script.google.com/macros/s/AKfycbzH3ZAwcL5U98fXeQtXo0WC-oGAlJt4KL2DmmNV4EA9cUBSLZw/exec' 
+  url: 'https://script.google.com/macros/s/AKfycbzH3ZAwcL5U98fXeQtXo0WC-oGAlJt4KL2DmmNV4EA9cUBSLZw/exec'  
 });
 
 App.IndexRoute = Ember.Route.extend({
   model: function() {
     var controller = this.controllerFor('index');
-    return controller.posts('?limit=' + controller.get('limit'));
+    return controller.query('?limit=' + controller.get('limit'));
   }
 });
 
@@ -32,14 +32,14 @@ App.IndexController = Ember.ObjectController.extend({
   actions: { 
     more: function() {
       var model = this.get('model');;
-      this.posts('?limit=' + this.get('limit') + '&offset=' + (this.get('total'))).then(function(data) {       
+      this.query('?limit=' + this.get('limit') + '&offset=' + (this.get('total'))).then(function(data) {       
         data.posts.forEach(function(post) {
            model.posts.pushObject(post);
         });
       });
     }
   }, 
-  posts: function(query) {
+  query: function(query) {
     var url = this.controllerFor('application').get('url') + query, 
         self = this;
     return $.getJSON(url).then(function(data) {
@@ -89,31 +89,24 @@ App.IndexController = Ember.ObjectController.extend({
 });
 
 App.PostsRoute = Ember.Route.extend({
-  model: function() {
-    return this.modelFor('index').posts;
-  }
+  controllerName: 'index'
 });
 
 App.TagsRoute = Ember.Route.extend({
   model: function(params) {
-    return this.modelFor('index').posts.filter(function(post) {
+    var posts = this.modelFor('index').posts.filter(function(post) {
       return post.tags.indexOf(params.tag_name) !== -1;
     });
+    return {posts: posts};
   }
 });
 
-// App.TagsController = Ember.ObjectController.extend({
-//   needs: 'index', 
-//   filter: function() {
-//     return this.get('controllers.index')
-//   }
-// });
-
 App.ArchivesRoute = Ember.Route.extend({
   model: function(params) {
-    return this.modelFor('index').posts.filter(function(post) {      
+    var posts = this.modelFor('index').posts.filter(function(post) {      
       return post.date.getFullYear() === +params.year && post.date.getMonth() === +params.month;
     });
+    return {posts: posts};
   }
 });
 

@@ -23,6 +23,9 @@
           {{#link-to "posts" classNames="blog-nav-item"}}Home{{/link-to}}
           {{#link-to "sample" classNames="blog-nav-item"}}Sample{{/link-to}}
           {{#link-to "new" classNames="blog-nav-item"}}New{{/link-to}}
+          <a class="blog-nav-item" href="http://dab00.gweb.io/play/" target="_blank">Play</a>
+          <a class="blog-nav-item" href="https://github.com/dab00/yet-another-blog" target="_blank">GitHub</a>
+          <a class="blog-nav-item" href="https://docs.google.com/spreadsheets/d/1lZ7oRBaWTRQEDlUu2MWo_9igRTGQ66QXQP5a8XcWKA8/edit#gid=0" target="_blank">Datasource</a>
         </nav>
       </div>
     </div>
@@ -42,10 +45,7 @@
 
   <script type="text/x-handlebars" id="index">
     <div class="col-sm-8 blog-main">
-      {{outlet}}
-      {{#if hasMore}}
-      <button class="btn btn-primary btn-lg" {{action 'more'}}>More</button>
-      {{/if}}
+      {{outlet}}      
     </div><!-- /.blog-main -->
     <div class="col-sm-3 col-sm-offset-1 blog-sidebar">
       {{partial "sidebar"}}
@@ -54,6 +54,9 @@
 
   <script type="text/x-handlebars" id="posts">
     {{partial "posts-wrapper"}}
+    {{#if hasMore}}
+    <button class="btn btn-primary btn-lg" {{action 'more'}}>More</button>
+    {{/if}}
   </script>
 
   <script type="text/x-handlebars" id="tags">
@@ -81,7 +84,7 @@
   </script>
 
   <script type="text/x-handlebars" id="posts-wrapper">
-    {{#each}}
+    {{#each posts}}
     <div class="blog-post">
       {{partial "post-header"}}
       {{partial "post-tags"}}      
