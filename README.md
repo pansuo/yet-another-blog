@@ -22,4 +22,4 @@ TODO
 
 Disclaimer
 ----------
-It is neither"ember-style" application nor "production-ready" solution, rather my own attempt to mix Ember.js and Google Apps Script.
+It is neither "ember-style" application nor "production-ready" solution, rather my humble attempt to mix Ember.js and Google Apps Script.
