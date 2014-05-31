@@ -1,11 +1,11 @@
 yet-another-blog
 ================
 
-Simple blog on Ember.js + Google Apps Script. [View sample](http://dab00.gweb.io/)
+Simple blog on Ember.js + Google Apps Script. [View sample](https://googledrive.com/host/0B0YcK5KeNe1tMngtVkduNnBpams/)
 
 Test
 ----------
-You can test this app - add/edit posts - on the [playground](http://dab00.gweb.io/play/). 
+You can test this app - add/edit posts - on the [playground](https://googledrive.com/host/0B0YcK5KeNe1tMngtVkduNnBpams//play/). 
 All posts are stored in the [table](https://docs.google.com/spreadsheets/d/1lZ7oRBaWTRQEDlUu2MWo_9igRTGQ66QXQP5a8XcWKA8/edit#gid=0) on Google Drive in Markdown format and are delivered via script (*code.gs*) which is embedded into the table.
 
 How to
